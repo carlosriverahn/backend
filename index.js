@@ -5,17 +5,13 @@ const cors = require('cors');
 const { dbConnection } = require('./database/config')
 
 const app = express();
+const port = process.env.PORT;
+
+app.use( express.json() );
 app.use( cors() );
-
-
 dbConnection();
 
-const port = process.env.PORT;
-app.get( '/', (req, res) => {
-    res.json({
-        "ok": true,
-        msg: "Hola Mundo "
-    });
-});
+app.use('/api/users', require('./routes/users') );
+app.use('/api/login', require('./routes/auth') );
 
 app.listen(port, () => console.log(`listening on http://localhost:${port}`));
