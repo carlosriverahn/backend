@@ -3,18 +3,28 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const generateJWT = require('../helpers/jwt');
 
-
 const getUsers = async(req, res) => {
-    const users = await User.find( {}, 'name lastName email role google' );
-    res.json({
+
+    const from = Number(req.query.from) || 0;
+
+    const [ users, total] = await Promise.all([
+            User.find( {}, 'name lastName email role google img' )
+            .skip( from )
+            .limit( 5 ),
+    
+            User.countDocuments()
+    ]);
+
+    return res.json({
         "ok": true,
         users,
-        uid: req.uid
+        uid: req.uid,
+        total
     });
 }
 
 const createUser = async(req, res = response) => {
-    const { user, lastName, email, password } = req.body;
+    const { email, password } = req.body;
     try {
         const existingEmail = await User.findOne({ email });
         if (existingEmail) {
@@ -24,9 +34,6 @@ const createUser = async(req, res = response) => {
             });
         }
 
-
-
-        console.log(password);
         const user = new User( req.body );
 
         //encrypter password
@@ -35,13 +42,12 @@ const createUser = async(req, res = response) => {
 
         //save user
         await user.save();
-
-        const token = await generateJWT( user.id );
+        const token = generateJWT( user.id );
 
         res.json({
             "ok": true,
             user,
-            token
+            // token
         });
         
     } catch (error) {

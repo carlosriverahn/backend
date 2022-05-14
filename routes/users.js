@@ -9,7 +9,7 @@ const { jwtValidator } = require('../middlewares/jwt-validator');
 const router = Router();
 
 router.get( '/', [
-    jwtValidator 
+    jwtValidator
 ], getUsers);
 
 router.post( '/', [ 
