@@ -27,11 +27,9 @@ const createHospital = async (req, res = response) => {
         const HospitalDB = new Hospital( {user: uid ,...req.body} );
         //save Hospital
         await HospitalDB.save();
-        // const token = await generateJWT( Hospital.id );
         res.json({
             "ok": true,
             HospitalDB,
-            // token
         });
         
     } catch (error) {
@@ -45,83 +43,65 @@ const createHospital = async (req, res = response) => {
 }
 
 const updateHospital = async (req, res = response) => {
-    return res.json({
-        "ok": true,
-        msg: "Update"
-    });
-   
-    // const uid = req.uid;
-    // try {
-    //     const HospitalDB = await Hospital.findById( uid );
-    //     // console.log(HospitalDB);
-    //     if (!HospitalDB) {
-    //         return res.status(404).json({
-    //             ok: false,
-    //             msg: 'Hospital not existed'
-    //         });
-    //     }
+    const id = req.params.id;
+    const uid = req.uid;
+    try {
+        const HospitalDB = await Hospital.findById( id );
+        
+        if (!HospitalDB) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'Hospital not existed'
+            });
+        }
 
+        const hospitalChanges = {
+            ...req.body,
+            user: uid
+        }
 
-    //     //update Hospital
-    //     const {password, google, Name, ...fields} = req.body;
+        const fielsdUpdate = await Hospital.findByIdAndUpdate( id, hospitalChanges, {new: true} );
+        
+        res.json({
+            "ok": true,
+            msg: "Update",
+            Hospital: fielsdUpdate
+        });
 
-    //     if (HospitalDB.Name !== Name) {
-    //         const existedName = await Hospital.findOne({ Name });
-    //         if (existedName) {
-    //             return res.status(400).json({
-    //                 ok: false,
-    //                 msg: 'This Name alredy exists'
-    //             });
-    //         }
-    //     } 
-
-    //     fields.Name = Name;
-
-    //     const fielsdUpdate = await Hospital.findByIdAndUpdate( uid, fields, {new: true} );
-
-    //     res.json({
-    //         ok: true,
-    //         Hospital: fielsdUpdate
-    //     })
-    // } catch (error) {
-    //     console.log(error);
-    //     res.status(500).json({
-    //         ok: false,
-    //         msg: 'Unexpect error'
-    //     });
-    // }
-
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Unexpect error'
+        });
+    }
 }
 
 const deleteHospital = async (req, res = response) => {
-    return res.json({
-        "ok": true,
-        msg: "delete"
-    });
-    // const uid = req.params.id;;
+    const uid = req.params.id;
 
-    // try {
-    //     checkHospitalId = await Hospital.findById({uid});
-    //     if (checkHospitalId) {
-    //         await Hospital.findByIdAndDelete( uid );
-    //         res.status(200).json({
-    //             ok: true,
-    //             msg: 'Deleted Hospital',
-    //             uid
-    //         });
-    //     } else {
-    //         res.status(404).json({
-    //             ok: false,
-    //             msg: 'Wrong uid',
-    //         });
+    try {
+        checkHospitalId = await Hospital.findById({uid});
+        if (checkHospitalId) {
+            await Hospital.findByIdAndDelete( uid );
+            res.status(200).json({
+                ok: true,
+                msg: 'Deleted Hospital',
+                uid
+            });
+        } else {
+            res.status(404).json({
+                ok: false,
+                msg: 'Wrong uid',
+            });
             
-    //     }
-    // } catch (error) {
-    //     res.status(500).json({
-    //         ok: false,
-    //         msg: 'Error trying to delete this Hospital'
-    //     });
-    // }
+        }
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error trying to delete this Hospital'
+        });
+    }
 }
 
 module.exports = {

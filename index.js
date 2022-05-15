@@ -4,12 +4,15 @@ const express = require('express');
 const cors = require('cors');
 const { dbConnection } = require('./database/config')
 
-const app = express();
+ const app = express();
 const port = process.env.PORT;
 
 app.use( express.json() );
 app.use( cors() );
 dbConnection();
+
+//public directory
+app.use( express.static('public') );
 
 app.use('/api/login', require('./routes/auth') );
 app.use('/api/users', require('./routes/users') );

@@ -14,7 +14,6 @@ const login = async (req, res = response) => {
                 msg: 'Wrong username or password1'
             });
         } 
-        
 
         const validPassword = bcrypt.compareSync( password, userDB.password );
 
@@ -26,7 +25,6 @@ const login = async (req, res = response) => {
         }
         
         const token = await generateJWT( userDB.id );
-
 
         res.status(200).json({
             ok: true,
@@ -44,6 +42,20 @@ const login = async (req, res = response) => {
     }
 }
 
+const renewToken = async( req, res = response ) => {
+
+    const uid = req.uid
+
+    const token = await generateJWT( uid );
+
+    res.json({
+        ok: true,
+        uid,
+        newtoken: token
+    });
+}
+
 module.exports = {
-    login
+    login,
+    renewToken
 }

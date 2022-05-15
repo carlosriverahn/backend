@@ -14,7 +14,6 @@ const router = Router();
 
 router.get("/", [
   jwtValidator,
-    
 ], getHospitals);
 
 router.post("/", [
@@ -24,11 +23,13 @@ router.post("/", [
 ], createHospital);
 
 router.put("/:id", [
-
+  check('name','The name is mandatory').not().isEmpty(),
+  fieldValidator,
+  jwtValidator,
 ], updateHospital);
 
 router.delete("/:id", [
-
+  jwtValidator,
 ], deleteHospital);
 
 module.exports = router;
